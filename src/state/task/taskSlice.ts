@@ -1,4 +1,5 @@
 import { Assignee, Task, TaskDetails } from "@/components/custom/task-table";
+import { showErrorToast, showSuccessToast } from "@/components/custom/toast";
 import { getBaseUrl, logout } from "@/utils/utils";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
@@ -47,7 +48,7 @@ interface TaskState {
   photos: TaskDocument[];
   categories: TaskCategory[];
   currentTask: Task | null;
-  units: TaskUnit[],
+  units: TaskUnit[];
   currentTaskDetails: TaskDetails | null;
 }
 
@@ -109,6 +110,47 @@ const taskSlice = createSlice({
         }
       );
 
+      builder
+      .addCase(deleteTask.pending, () => {
+        console.log("Task is being deleted");
+      })
+      .addCase(
+        deleteTask.fulfilled,
+        (state, action: PayloadAction<String>) => {
+          if(action.payload){
+            state.tasks = state.tasks.filter((task) => task.task_id == action.payload);
+          }
+        }
+      );
+
+    builder
+      .addCase(updateTaskProgress.pending, () => {
+        console.log("Task Progress Loading");
+      })
+      .addCase(
+        updateTaskProgress.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          let taskDetails = state.currentTaskDetails;
+
+          if (state.currentTask != null && action.payload != null) {
+            console.log("TEST");
+            console.log(action.payload);
+            console.log(action.payload["total_task_progress"]);
+            console.log( (action.payload['total_task_progress'] / state.currentTask.estimated_work ) * 100);
+            state.currentTask = {
+              ...state.currentTask,
+              progress: action.payload["total_task_progress"],
+              progress_percentage: (action.payload['total_task_progress'] / state.currentTask.estimated_work ) * 100,
+            };
+          }
+
+          if (taskDetails) {
+            taskDetails.task_progress = action.payload["total_task_progress"];
+            state.currentTaskDetails = taskDetails;
+          }
+        }
+      );
+
     builder
       .addCase(setTaskFiles.pending, () => {
         console.log("Task Attachments Loading");
@@ -134,7 +176,6 @@ const taskSlice = createSlice({
         (state, action: PayloadAction<TaskDetails>) => {
           if (action.payload != null) {
             state.currentTaskDetails = action.payload;
-
           }
 
           if (state.currentTask != null && action.payload != null) {
@@ -143,12 +184,13 @@ const taskSlice = createSlice({
               category: action.payload.category,
               status: action.payload.status,
             };
-            state.tasks = state.tasks.filter((task) => task.task_id != action.payload.id);
-            state.tasks = [state.currentTask, ...state.tasks]
+            state.tasks = state.tasks.filter(
+              (task) => task.task_id != action.payload.id
+            );
+            state.tasks = [state.currentTask, ...state.tasks];
             console.log("SLICE TEST");
           }
         }
-
       );
 
     builder
@@ -175,13 +217,12 @@ const taskSlice = createSlice({
         addAttachments.fulfilled,
         (state, action: PayloadAction<TaskDocument[]>) => {
           action.payload.forEach((doc) => {
-            if (!doc.filetype.includes('image')) {
+            if (!doc.filetype.includes("image")) {
               state.documents = [...state.documents, ...action.payload];
             } else {
               state.photos = [...state.photos, ...action.payload];
             }
-          })
-
+          });
         }
       );
 
@@ -193,8 +234,10 @@ const taskSlice = createSlice({
         getAssignees.fulfilled,
         (state, action: PayloadAction<User[]>) => {
           console.log(state.assignees);
-          state.assignees = action.payload.filter((element) =>
-            !element.roles.includes("Admin") && !element.roles.includes("Manager"),
+          state.assignees = action.payload.filter(
+            (element) =>
+              !element.roles.includes("Admin") &&
+              !element.roles.includes("Manager")
           );
         }
       );
@@ -207,7 +250,10 @@ const taskSlice = createSlice({
         addAssigneeToTask.fulfilled,
         (state, action: PayloadAction<Assignee[]>) => {
           if (state.currentTaskDetails) {
-            state.currentTaskDetails.assignee = [...state.currentTaskDetails?.assignee, ...action.payload];
+            state.currentTaskDetails.assignee = [
+              ...state.currentTaskDetails?.assignee,
+              ...action.payload,
+            ];
           }
         }
       );
@@ -216,27 +262,24 @@ const taskSlice = createSlice({
       .addCase(addTask.pending, () => {
         console.log("Creating Task");
       })
-      .addCase(
-        addTask.fulfilled,
-        (state, action: PayloadAction<Task2>) => {
-          console.log(action.payload);
-          if (action.payload) {
-            let newTask: Task = {
-              title: action.payload.name,
-              task_id: action.payload.id,
-              expected_end_date: null,
-              status: "Yet To Start",
-              category: action.payload.category,
-              estimated_work: 100,
-              unit: "Percentage",
-              progress: 0,
-              progress_percentage: 0,
-            }
+      .addCase(addTask.fulfilled, (state, action: PayloadAction<Task2>) => {
+        console.log(action.payload);
+        if (action.payload) {
+          let newTask: Task = {
+            title: action.payload.name,
+            task_id: action.payload.id,
+            expected_end_date: null,
+            status: "Yet To Start",
+            category: action.payload.category,
+            estimated_work: 100,
+            unit: "Percentage",
+            progress: 0,
+            progress_percentage: 0,
+          };
 
-            state.tasks = [...state.tasks, newTask];
-          }
+          state.tasks = [...state.tasks, newTask];
         }
-      );
+      });
   },
 });
 
@@ -268,6 +311,39 @@ export const getTasks = createAsyncThunk(
         logout();
       }
       return [];
+    }
+  }
+);
+
+export const deleteTask = createAsyncThunk(
+  "task/deleteTask",
+  async (taskId: String) => {
+    try {
+      const apiKey = localStorage.getItem("api_key");
+      const apiSecret = localStorage.getItem("api_secret");
+
+      if (!apiKey || !apiSecret) {
+        throw new Error("Missing API credentials");
+      }
+
+      const response = await axios.get(
+        `${await getBaseUrl()}/api/method/bs_customisations.api.delete_task?task_id=${taskId}`,
+        {
+          headers: {
+            Authorization: `token ${apiKey}:${apiSecret}`,
+          },
+        }
+      );
+
+      showSuccessToast("Task is deleted");
+      return taskId;
+    } catch (error: any) {
+      console.error("Tasks delete failed:", error);
+      showErrorToast("Something went wrong");
+      if (error.response.status == 401) {
+        logout();
+      }
+      return "";
     }
   }
 );
@@ -484,10 +560,10 @@ export const updateTaskProgress = createAsyncThunk(
         throw new Error("Missing API credentials");
       }
       const formData = new FormData();
-    
+
       // Append data to FormData
-      formData.append('params', JSON.stringify(payload));
-      
+      formData.append("params", JSON.stringify(payload));
+
       const response = await axios.post(
         `${await getBaseUrl()}/api/method/bs_customisations.api.update_task_progress`,
         formData,
@@ -499,11 +575,12 @@ export const updateTaskProgress = createAsyncThunk(
         }
       );
 
-      console.log("Task Progress Updated", response.data);
-
-      return response.data; // Return the response data
+      console.log("Task Progress Updated", response.data.details);
+      showSuccessToast("Task is updated");
+      return response.data.details; // Return the response data
     } catch (error: any) {
       console.error("Get Tasks failed:", error);
+      showErrorToast("Update Task is Failed");
       if (error.response.status == 401) {
         logout();
       }
@@ -568,7 +645,7 @@ export const addAssigneeToTask = createAsyncThunk(
         let user: Assignee = {
           user_name: assigneeData["user_id"][0],
           user_email: assigneeData["user_id"][0],
-        }
+        };
         return [user];
       } else {
         return [];
@@ -584,20 +661,21 @@ export const addAssigneeToTask = createAsyncThunk(
 );
 
 export const addTask = createAsyncThunk(
-  'task/addTask',
+  "task/addTask",
   async (taskData: any) => {
     try {
       const apiKey = localStorage.getItem("api_key");
       const apiSecret = localStorage.getItem("api_secret");
       const url = `${await getBaseUrl()}/api/method/bs_customisations.api.create_task`;
 
-      const response = await axios.post(url,
-        { "params": taskData },
+      const response = await axios.post(
+        url,
+        { params: taskData },
         {
           headers: {
             Authorization: `token ${apiKey}:${apiSecret}`,
           },
-        },
+        }
       );
 
       if (response.status == 201) {
@@ -605,7 +683,6 @@ export const addTask = createAsyncThunk(
       } else {
         return null;
       }
-
     } catch (error: any) {
       console.error("Get Tasks failed:", error);
       if (error.response.status == 401) {

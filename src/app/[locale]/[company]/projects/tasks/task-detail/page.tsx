@@ -38,6 +38,7 @@ import { AppDispatch, RootState, store } from "@/state/store";
 import {
   addAssigneeToTask,
   addAttachments,
+  deleteTask,
   getAssignees,
   removeAssignee,
   setTaskDetails,
@@ -59,6 +60,7 @@ import {
   MdCloudUpload,
   MdDescription,
   MdEdit,
+  MdMoreVert,
   MdOutlineAttachment,
   MdOutlineCalendarMonth,
   MdOutlineDescription,
@@ -100,6 +102,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import TaskImage from "@/components/custom/task-image";
 import { gcompanyId } from "@/utils/utils";
+import { useRouter } from "next/navigation";
 
 interface FileWithPreview extends File {
   preview: string;
@@ -130,6 +133,8 @@ export default function TaskDetails() {
   const [desc, setDesc] = useState<string>("");
   const [open, setOpen] = useState(false);
 
+  const [taskOption, setTaskOption] = useState(false);
+
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [assigneeOpen, setAssigneeOpen] = useState(false);
 
@@ -148,6 +153,8 @@ export default function TaskDetails() {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
 
   const [rawfiles, setRawFiles] = useState<File[]>([]);
+
+  const router = useRouter();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach((file) => {
@@ -192,6 +199,11 @@ export default function TaskDetails() {
 
   const removeFile = (fileName: string) => {
     setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+  };
+
+  const deleteCurrentTask = () => {
+    dispatch(deleteTask(task?.task_id ?? ""));
+    router.push(`/${gcompanyId}/projects/tasks`);
   };
 
   const handleSliderChange = (value: number[]) => {
@@ -285,12 +297,31 @@ export default function TaskDetails() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="flex items-center justify-start text-xl font-semibold mb-4">
-          <Link href={`/${gcompanyId}/projects/tasks`}>
-            <MdArrowBackIos className="mr-2" />
-          </Link>
-          <p className="mr-2">{task?.title}</p>
-          {/* <PiCaretUpDownBold /> */}
+        <div className="flex items-center justify-between text-xl font-semibold mb-4">
+          <div className="flex items-center justify-start">
+            <Link href={`/${gcompanyId}/projects/tasks`}>
+              <MdArrowBackIos className="mr-2" />
+            </Link>
+            <p className="mr-2">{task?.title}</p>
+          </div>
+
+          <Popover open={taskOption} onOpenChange={setTaskOption}>
+            <PopoverTrigger asChild>
+              <div className=" bg-neutral-100  p-1 cursor-pointer rounded-full">
+                <MdMoreVert className="text-2xl cursor-pointer" />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-[150px] h-max p-0">
+              <div className="h-hull w-full">
+                <p
+                  onClick={deleteCurrentTask}
+                  className="hover:bg-slate-50 cursor-pointer px-4 py-4"
+                >
+                  Delete
+                </p>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="">

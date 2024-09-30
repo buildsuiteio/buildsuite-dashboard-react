@@ -27,12 +27,12 @@ export default function TaskLayout({ children }: Props) {
 
   return (
     <main className="relative w-full h-[90vh] flex items-center justify-between box-border">
-      <div className="!w-[15%] h-full bg-white dark:bg-slate-900 p-4 rounded-sm">
+      <div className="!w-[15%] h-full  p-4 rounded-sm">
         <div
           onClick={() => {
             router.push(`/${gcompanyId}/projects`);
           }}
-          className="w-[100%] flex items-center justify-start cursor-pointer mb-6"
+          className="w-[100%] flex items-center justify-center cursor-pointer mb-6"
         >
           <MdArrowBackIos />
           <p className="text-md font-semibold text-slate-900 dark:text-white">
@@ -43,7 +43,7 @@ export default function TaskLayout({ children }: Props) {
         <div className="w-[100%] flex flex-col items-center justify-center">
           <img
             src="https://cdn.cpdonline.co.uk/wp-content/uploads/2023/03/04151341/Everything-you-need-to-know-about-Construction-Site-Safety.jpg"
-            className="h-[150px] w-[150px] object-cover rounded-full"
+            className="h-[150px] w-[150px] object-cover rounded-md"
           />
           <p className="text-lg font-semibold text-slate-900 dark:text-white  mt-2 mb-6">
             {project ? project?.project_name : "NA"}
