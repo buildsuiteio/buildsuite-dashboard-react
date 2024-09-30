@@ -28,16 +28,16 @@ export default function TaskLayout({ children }: Props) {
   return (
     <main className="relative w-full h-[90vh] flex items-center justify-between box-border">
       <div className="!w-[15%] h-full  p-4 rounded-sm">
-        <div
-          onClick={() => {
-            router.push(`/${gcompanyId}/projects`);
-          }}
-          className="w-[100%] flex items-center justify-center cursor-pointer mb-6"
-        >
-          <MdArrowBackIos />
-          <p className="text-md font-semibold text-slate-900 dark:text-white">
-            Go to Projects
-          </p>
+        <div className="w-full flex items-center justify-center">
+          <div
+            onClick={() => {
+              router.push(`/${gcompanyId}/projects`);
+            }}
+            className="w-max flex items-center rounded-sm shadow-sm justify-center cursor-pointer mb-6 px-4 py-1 text-slate-900 bg-white"
+          >
+            <MdArrowBackIos />
+            <p className="text-sm font-semibold ml-1">Go to Projects</p>
+          </div>
         </div>
 
         <div className="w-[100%] flex flex-col items-center justify-center">
