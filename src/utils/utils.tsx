@@ -33,6 +33,7 @@ export async function getBaseUrl() {
   }
 }
 
+// LOGOUT
 export function logout() {
   localStorage.setItem("sid", "");
   localStorage.setItem("api_key", "");
