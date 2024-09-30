@@ -127,7 +127,7 @@ const taskSlice = createSlice({
 
     builder
       .addCase(updateTask.pending, () => {
-        console.log("Task Updating");
+        console.log("Task Updating ...");
       })
       .addCase(
         updateTask.fulfilled,
@@ -477,15 +477,24 @@ export const updateTaskProgress = createAsyncThunk(
   "task/updateTaskProgress",
   async (payload: any) => {
     try {
-      const formData = new FormData();
+      const apiKey = localStorage.getItem("api_key");
+      const apiSecret = localStorage.getItem("api_secret");
 
+      if (!apiKey || !apiSecret) {
+        throw new Error("Missing API credentials");
+      }
+      const formData = new FormData();
+    
+      // Append data to FormData
+      formData.append('params', JSON.stringify(payload));
+      
       const response = await axios.post(
         `${await getBaseUrl()}/api/method/bs_customisations.api.update_task_progress`,
-        formData, // Pass the formData object in the request body
+        formData,
         {
-          params: payload,
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `token ${apiKey}:${apiSecret}`,
           },
         }
       );

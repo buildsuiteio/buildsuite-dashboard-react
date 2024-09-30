@@ -1350,21 +1350,23 @@ export default function TaskDetails() {
                   />
                 </div>
 
-                <Button
-                  onClick={() => {
-                    var taskData = {
-                      task_id: taskDetail?.id,
-                      progress: progress,
-                      remarks: remark,
-                    };
+                <DialogClose className="w-full">
+                  <Button
+                    onClick={() => {
+                      var taskData = {
+                        task_id: taskDetail?.id,
+                        progress: progress,
+                        remarks: remark,
+                      };
 
-                    dispatch(updateTaskProgress(taskData));
-                    setOpen(false);
-                  }}
-                  className="w-full bg-green-600 my-6"
-                >
-                  Update
-                </Button>
+                      dispatch(updateTaskProgress(taskData));
+                      setOpen(false);
+                    }}
+                    className="w-full bg-green-600 my-6"
+                  >
+                    Update
+                  </Button>
+                </DialogClose>
               </div>
             </DialogHeader>
           </DialogContent>
