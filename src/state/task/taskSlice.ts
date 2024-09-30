@@ -127,7 +127,7 @@ const taskSlice = createSlice({
 
     builder
       .addCase(updateTask.pending, () => {
-        console.log("Task Updating ...");
+        console.log("Task Updating...");
       })
       .addCase(
         updateTask.fulfilled,
