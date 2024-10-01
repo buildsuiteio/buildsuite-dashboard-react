@@ -3,7 +3,7 @@
 import { formatDate } from "@/components/custom/date-format";
 import { RadialChart } from "@/components/custom/gauge-chart";
 import { TaskCarousel } from "@/components/custom/task-carousel";
-import { Assignee } from "@/components/custom/task-table";
+import { Assignee, Photo } from "@/components/custom/task-table";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { DatePickerWithRange } from "@/components/ui/daterangepicker";
@@ -45,6 +45,7 @@ import {
   setTaskFiles,
   setUnits,
   TaskCategory,
+  TaskDocument,
   TaskUnit,
   updateTask,
   updateTaskProgress,
@@ -139,6 +140,12 @@ export default function TaskDetails() {
   const [assigneeOpen, setAssigneeOpen] = useState(false);
 
   const [progressOpen, setProgressOpen] = useState(false);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewOpen1, setPreviewOpen1] = useState(false);
+  const [previewOpen2, setPreviewOpen2] = useState(false);
+  const [previewOpen3, setPreviewOpen3] = useState(false);
+
   const [progress, setProgress] = useState(0);
   const [noProgress, setNoProgress] = useState(false);
   const [image, setImage] = useState(false);
@@ -199,6 +206,14 @@ export default function TaskDetails() {
 
   const removeFile = (fileName: string) => {
     setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+  };
+
+  const deleteFile = (file: TaskDocument) => {
+    setPreviewOpen(false);
+    setPreviewOpen1(false);
+    setPreviewOpen2(false);
+    setPreviewOpen3(false);
+    console.log(file.filename);
   };
 
   const deleteCurrentTask = () => {
@@ -912,7 +927,7 @@ export default function TaskDetails() {
       </div>
 
       <div className="bg-white h-full w-[34%] flex flex-col justify-between p-3">
-        <div className="h-full mb-4">
+        <div className="h-full mb-4 pr-2 overflow-y-auto">
           <div className="w-full h-[30%] border-solid border-2 border-neutral-100 rounded-md p-4 overflow-hidden">
             <div className="mb-3 px-1 pb-3">
               <div className="flex items-center justify-between border-b-2 border-solid border-neutral-100 pb-4 mb-4">
@@ -1179,7 +1194,10 @@ export default function TaskDetails() {
                       }`}
                     >
                       {image && (
-                        <Dialog>
+                        <Dialog
+                          open={previewOpen}
+                          onOpenChange={setPreviewOpen}
+                        >
                           {taskImages.map((doc, index) => {
                             return (
                               <DialogTrigger>
@@ -1199,6 +1217,7 @@ export default function TaskDetails() {
                             <TaskCarousel
                               images={taskImages}
                               currentIndex={imageIndex}
+                              onDelete={deleteFile}
                             />
                             <DialogClose className="text-white absolute top-6 right-6">
                               <MdClose className="text-2xl" />
@@ -1237,7 +1256,7 @@ export default function TaskDetails() {
             </div>
             {taskImages.length > 0 && (
               <div className="flex items-center justify-start gap-3 w-[90%] overflow-y-hidden overflow-x-auto h-[105px] pb-4 mx-2">
-                <Dialog>
+                <Dialog open={previewOpen1} onOpenChange={setPreviewOpen1}>
                   <DialogTrigger className="flex items-center justify-start gap-6 w-full overflow-x-auto py-1">
                     {taskImages.map((doc, index) => {
                       return (
@@ -1260,6 +1279,7 @@ export default function TaskDetails() {
                     <TaskCarousel
                       images={taskImages}
                       currentIndex={imageIndex}
+                      onDelete={deleteFile}
                     />
                     <DialogClose className="text-white absolute top-6 right-6">
                       <MdClose className="text-2xl" />
@@ -1277,7 +1297,7 @@ export default function TaskDetails() {
           </div>
 
           {taskDetail?.timeline && taskDetail?.timeline?.length > 0 && (
-            <div className="pb-4  overflow-y-auto">
+            <div className="pb-4">
               <div className="flex items-center justify-between my-2 mx-2">
                 <p>Timeline</p>
 
@@ -1317,7 +1337,10 @@ export default function TaskDetails() {
 
                             {doc.photo.length > 0 && (
                               <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
-                                <Dialog>
+                                <Dialog
+                                  open={previewOpen2}
+                                  onOpenChange={setPreviewOpen2}
+                                >
                                   <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
                                     {doc.photo.map((doc, index) => {
                                       return (
@@ -1342,6 +1365,7 @@ export default function TaskDetails() {
                                     <TaskCarousel
                                       images={doc.photo}
                                       currentIndex={timelineImageIndex}
+                                      onDelete={deleteFile}
                                     />
                                     <DialogClose className="text-white absolute top-6 right-6">
                                       <MdClose className="text-2xl" />
@@ -1358,64 +1382,71 @@ export default function TaskDetails() {
                 </Sheet>
               </div>
               <div className="pt-2">
-                {taskDetail?.timeline?.map((doc) => {
-                  return (
-                    <div className=" border-[1px] border-neutral-200 rounded-md p-4 mx-2 mb-3">
-                      <div className="flex items-center justify-start">
-                        <Image
-                          src="/images/timeline.png"
-                          alt="category"
-                          width={24}
-                          height={15}
-                          className="mr-4 w-7 h-7 text-slate-600 "
-                        />
-                        <div key={doc.task_update_id} className="">
-                          <p className="text-sm">{doc.title}</p>
-                          <p className="text-[10px] text-neutral-500 w-max overflow-x-hidden">
-                            {doc.remark.substring(0, 100)}
-                          </p>
-                          <div className="text-sm text-neutral-300 flex items-center justify-between">
-                            <p>{formatDate(doc.date)}</p>
-                            <p>{doc.updated_by}</p>
+                {taskDetail?.timeline?.map((doc, index) => {
+                  if (index <= 2)
+                    return (
+                      <div className=" border-[1px] border-neutral-200 rounded-md p-4 mx-2 mb-3">
+                        <div className="flex items-center justify-start">
+                          <Image
+                            src="/images/timeline.png"
+                            alt="category"
+                            width={24}
+                            height={15}
+                            className="mr-4 w-7 h-7 text-slate-600 "
+                          />
+                          <div key={doc.task_update_id} className="">
+                            <p className="text-sm">{doc.title}</p>
+                            <p className="text-[10px] text-neutral-500 w-max overflow-x-hidden">
+                              {doc.remark.substring(0, 100)}
+                            </p>
+                            <div className="text-sm text-neutral-300 flex items-center justify-between">
+                              <p>{formatDate(doc.date)}</p>
+                              <p>{doc.updated_by}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {doc.photo.length > 0 && (
-                        <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
-                          <Dialog>
-                            <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
-                              {doc.photo.map((doc, index) => {
-                                return (
-                                  <Image
-                                    alt="photo"
-                                    width={0}
-                                    height={0}
-                                    key={doc.id}
-                                    src={doc.file_url_with_protocol}
-                                    onClick={() => setTimelineImageIndex(index)}
-                                    className="h-[100px]  min-w-[100px] object-cover rounded-sm !cursor-pointer"
-                                  />
-                                );
-                              })}
-                            </DialogTrigger>
-                            <DialogContent className="min-w-full h-full bg-[#1717173d] border-transparent">
-                              <DialogHeader className="mb-4 text-white">
-                                <DialogTitle>Task Images</DialogTitle>
-                              </DialogHeader>
-                              <TaskCarousel
-                                images={doc.photo}
-                                currentIndex={timelineImageIndex}
-                              />
-                              <DialogClose className="text-white absolute top-6 right-6">
-                                <MdClose className="text-2xl" />
-                              </DialogClose>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      )}
-                    </div>
-                  );
+                        {doc.photo.length > 0 && (
+                          <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
+                            <Dialog
+                            // open={previewOpen3}
+                            // onOpenChange={setPreviewOpen3}
+                            >
+                              <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
+                                {doc.photo.map((doc, index) => {
+                                  return (
+                                    <Image
+                                      alt="photo"
+                                      width={0}
+                                      height={0}
+                                      key={doc.id}
+                                      src={doc.file_url_with_protocol}
+                                      onClick={() =>
+                                        setTimelineImageIndex(index)
+                                      }
+                                      className="h-[100px]  min-w-[100px] object-cover rounded-sm !cursor-pointer"
+                                    />
+                                  );
+                                })}
+                              </DialogTrigger>
+                              <DialogContent className="min-w-full h-full bg-[#1717173d] border-transparent">
+                                <DialogHeader className="mb-4 text-white">
+                                  <DialogTitle>Task Images</DialogTitle>
+                                </DialogHeader>
+                                <TaskCarousel
+                                  images={doc.photo}
+                                  currentIndex={timelineImageIndex}
+                                  onDelete={deleteFile}
+                                />
+                                <DialogClose className="text-white absolute top-6 right-6">
+                                  <MdClose className="text-2xl" />
+                                </DialogClose>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        )}
+                      </div>
+                    );
                 })}
               </div>
             </div>

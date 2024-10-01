@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -11,13 +10,19 @@ import {
 } from "@/components/ui/carousel";
 import { TaskDocument } from "@/state/task/taskSlice";
 import Image from "next/image";
+import { MdDelete } from "react-icons/md";
 
 interface TaskCarouselProps {
   images: TaskDocument[];
   currentIndex: number;
+  onDelete: (index: TaskDocument) => void; // Add a prop for the delete function
 }
 
-export function TaskCarousel({ images, currentIndex }: TaskCarouselProps) {
+export function TaskCarousel({
+  images,
+  currentIndex,
+  onDelete,
+}: TaskCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(currentIndex);
   const [count, setCount] = React.useState(0);
@@ -34,6 +39,10 @@ export function TaskCarousel({ images, currentIndex }: TaskCarouselProps) {
       });
     }
   }, [api, currentIndex]);
+
+  const handleDeleteClick = () => {
+    onDelete(images[current]); // Trigger the parent delete function with the current index
+  };
 
   return (
     <div className="mx-auto w-full h-full flex flex-col items-center justify-center">
@@ -60,6 +69,10 @@ export function TaskCarousel({ images, currentIndex }: TaskCarouselProps) {
       <div className="py-2 text-center text-sm text-muted-foreground">
         Slide {current} of {count}
       </div>
+      <MdDelete
+        className="text-white text-2xl cursor-pointer"
+        onClick={handleDeleteClick} // Handle the delete click
+      />
     </div>
   );
 }
