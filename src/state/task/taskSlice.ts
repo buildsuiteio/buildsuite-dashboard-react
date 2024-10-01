@@ -139,15 +139,16 @@ const taskSlice = createSlice({
               ...state.currentTask,
               category: action.payload.category,
               status: action.payload.status,
-              progress_percentage: (action.payload.total_task_progress / action.payload.estimated_work) * 100,
+              unit: action.payload.unit,
               estimated_work: action.payload.estimated_work,
-              progress: action.payload.total_task_progress,
+              progress: action.payload.total_task_progress ?? 0,
+              progress_percentage: (action.payload.total_task_progress / action.payload.estimated_work) * 100,
             };
             state.tasks = state.tasks.filter(
               (task) => task.task_id != action.payload.id
             );
             state.tasks = [state.currentTask, ...state.tasks];
-            console.log("SLICE TEST");
+            console.log("SLICE TESTS");
           }
         }
       );
@@ -184,12 +185,18 @@ const taskSlice = createSlice({
               ...state.currentTask,
               category: action.payload.category,
               status: action.payload.status,
+              unit: action.payload.unit,
+              estimated_work: action.payload.estimated_work,
+              progress: action.payload.total_task_progress ?? 0,
+              progress_percentage: ((action.payload.total_task_progress ?? 0) / action.payload.estimated_work) * 100,
             };
+
             state.tasks = state.tasks.filter(
               (task) => task.task_id != action.payload.id
             );
             state.tasks = [state.currentTask, ...state.tasks];
-            console.log("SLICE TEST");
+            console.log("SLICE TESTS");
+            console.log(state.currentTask);
           }
         }
       );

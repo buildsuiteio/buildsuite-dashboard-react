@@ -936,6 +936,135 @@ export default function TaskDetails() {
             </div>
           </div>
 
+          <div className="w-full my-3">
+            <Dialog open={progressOpen} onOpenChange={setProgressOpen}>
+              <DialogTrigger className="w-full">
+                <Button className="w-full bg-green-600 hover:bg-green-500">
+                  Update Task Progress
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="mb-6">
+                    Update Task Progress
+                  </DialogTitle>
+
+                  <div>
+                    <div className="flex items-center justify-between w-max border-2 rounded-sm border-green-600">
+                      <p
+                        onClick={() => setNoProgress(false)}
+                        className={`px-4 py-2 cursor-pointer ${
+                          !noProgress ? "bg-green-600 text-white" : "text-black"
+                        } `}
+                      >
+                        Update Progress
+                      </p>
+                      <p
+                        onClick={() => setNoProgress(true)}
+                        className={`px-4 py-2 cursor-pointer ${
+                          noProgress ? "bg-green-600 text-white" : "text-black"
+                        } `}
+                      >
+                        No Progress Today
+                      </p>
+                    </div>
+
+                    <div className="flex items-start justify-start my-4">
+                      <p className="mt-3 text-sm w-[25%]">Estimated</p>
+                      <p className="mt-3 text-sm">
+                        {taskDetail?.task_progress}/{taskDetail?.estimated_work}{" "}
+                        {taskDetail?.unit}
+                      </p>
+                    </div>
+
+                    {!noProgress && (
+                      <div className="flex items-start justify-start my-4">
+                        <p className="mt-3 text-sm w-[25%]">Work Progress</p>
+
+                        {taskDetail?.unit === "Percentage" ? (
+                          <Slider
+                            color="#37AD4A"
+                            className="mt-4 w-[60%]"
+                            onValueChange={handleSliderChange}
+                            value={[progress]}
+                            min={0}
+                            max={100}
+                            step={1}
+                          />
+                        ) : (
+                          <div className="w-[75%] flex flex-col items-start justify-between">
+                            <div className="flex items-center justify-start mt-3 border-b-2 border-neutral-400 w-[60%] pb-1">
+                              <input
+                                placeholder="Ex. 100"
+                                type="number"
+                                max={taskDetail?.estimated_work}
+                                min={0}
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    setProgress(Number(e.target.value));
+                                  }
+                                }}
+                                className="text-sm  w-[60%] border-none outline-none"
+                              />
+                              <p className="text-sm ml-4 self-end">
+                                {taskDetail?.unit}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {taskDetail?.unit === "Percentage" && (
+                          <p className="mt-3 text-sm">{progress}/100%</p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex items-start justify-between my-8">
+                      <p className="mt-1 text-sm w-[25%]">Remarks</p>
+
+                      <Textarea
+                        placeholder="Add Remarks here"
+                        rows={3}
+                        value={remark}
+                        onChange={(e) => setRemark(e.target.value)}
+                        className="w-[75%] mb-6"
+                      />
+                    </div>
+
+                    <DialogClose className="w-full">
+                      <Button
+                        onClick={() => {
+                          if (task?.unit == "Percentage") {
+                            var taskData = {
+                              task_id: taskDetail?.id,
+                              progress: progress - task.progress_percentage,
+                              remarks: remark,
+                            };
+                            console.log(taskData);
+                            dispatch(updateTaskProgress(taskData));
+                            setOpen(false);
+                          } else {
+                            var taskData = {
+                              task_id: taskDetail?.id,
+                              progress: progress,
+                              remarks: remark,
+                            };
+                            console.log(taskData);
+                            dispatch(updateTaskProgress(taskData));
+                            setOpen(false);
+                          }
+                        }}
+                        className="w-full bg-green-600 my-6"
+                      >
+                        Update
+                      </Button>
+                    </DialogClose>
+                  </div>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          </div>
+
           <div className="py-4 h-[20%] w-full">
             <div className="flex items-center justify-between mb-2 px-2 w-full">
               <p>Images</p>
@@ -1141,282 +1270,157 @@ export default function TaskDetails() {
             )}
 
             {taskImages.length == 0 && (
-              <div className="w-full h-[100px] flex text-neutral-300 items-center justify-center">
+              <div className="w-full h-max flex text-neutral-300 items-center justify-center">
                 <p>No Images uploaded yet</p>
               </div>
             )}
           </div>
 
-          <div className="pb-4 h-[50%] overflow-y-auto">
-            <div className="flex items-center justify-between my-2 mx-2">
-              <p>Timeline</p>
+          {taskDetail?.timeline && taskDetail?.timeline?.length > 0 && (
+            <div className="pb-4  overflow-y-auto">
+              <div className="flex items-center justify-between my-2 mx-2">
+                <p>Timeline</p>
 
-              <Sheet>
-                <SheetTrigger>
-                  <p className="text-sm text-blue-700 font-semibold">
-                    View All
-                  </p>
-                </SheetTrigger>
-                <SheetContent className="w-[30vw] min-w-[30vw]">
-                  <SheetHeader className="w-full">
-                    <SheetTitle>Timeline</SheetTitle>
-                  </SheetHeader>
-                  <div className="w-full h-full overflow-y-auto bg-white mt-4">
-                    {taskDetail?.timeline?.map((doc) => {
-                      return (
-                        <div className=" border-[1px] border-neutral-200 rounded-md p-4 mx-2 mb-3">
-                          <div className="flex items-center justify-start">
-                            <Image
-                              src="/images/timeline.png"
-                              alt="category"
-                              width={24}
-                              height={15}
-                              className="mr-4 w-7 h-7 text-slate-600 "
-                            />
-                            <div key={doc.task_update_id} className="">
-                              <p className="text-sm">{doc.title}</p>
-                              <p className="text-[10px] text-neutral-500 w-max overflow-x-hidden py-1">
-                                {doc.remark.substring(0, 100)}
-                              </p>
-                              <div className="text-sm text-neutral-300 flex items-center justify-between">
-                                <p>{formatDate(doc.date)}</p>
-                                <p>{doc.updated_by}</p>
+                <Sheet>
+                  <SheetTrigger>
+                    <p className="text-sm text-blue-700 font-semibold">
+                      View All
+                    </p>
+                  </SheetTrigger>
+                  <SheetContent className="w-[30vw] min-w-[30vw]">
+                    <SheetHeader className="w-full">
+                      <SheetTitle>Timeline</SheetTitle>
+                    </SheetHeader>
+                    <div className="w-full h-full overflow-y-auto bg-white mt-4">
+                      {taskDetail?.timeline?.map((doc) => {
+                        return (
+                          <div className=" border-[1px] border-neutral-200 rounded-md p-4 mx-2 mb-3">
+                            <div className="flex items-center justify-start">
+                              <Image
+                                src="/images/timeline.png"
+                                alt="category"
+                                width={24}
+                                height={15}
+                                className="mr-4 w-7 h-7 text-slate-600 "
+                              />
+                              <div key={doc.task_update_id} className="">
+                                <p className="text-sm">{doc.title}</p>
+                                <p className="text-[10px] text-neutral-500 w-max overflow-x-hidden py-1">
+                                  {doc.remark.substring(0, 100)}
+                                </p>
+                                <div className="text-sm text-neutral-300 flex items-center justify-between">
+                                  <p>{formatDate(doc.date)}</p>
+                                  <p>{doc.updated_by}</p>
+                                </div>
                               </div>
                             </div>
+
+                            {doc.photo.length > 0 && (
+                              <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
+                                <Dialog>
+                                  <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
+                                    {doc.photo.map((doc, index) => {
+                                      return (
+                                        <Image
+                                          alt="photo"
+                                          width={0}
+                                          height={0}
+                                          key={doc.id}
+                                          src={doc.file_url_with_protocol}
+                                          onClick={() =>
+                                            setTimelineImageIndex(index)
+                                          }
+                                          className="h-[100px]  min-w-[100px] object-cover rounded-sm !cursor-pointer"
+                                        />
+                                      );
+                                    })}
+                                  </DialogTrigger>
+                                  <DialogContent className="min-w-full h-full bg-[#1717173d] border-transparent">
+                                    <DialogHeader className="mb-4 text-white">
+                                      <DialogTitle>Task Images</DialogTitle>
+                                    </DialogHeader>
+                                    <TaskCarousel
+                                      images={doc.photo}
+                                      currentIndex={timelineImageIndex}
+                                    />
+                                    <DialogClose className="text-white absolute top-6 right-6">
+                                      <MdClose className="text-2xl" />
+                                    </DialogClose>
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
+                            )}
                           </div>
-
-                          {doc.photo.length > 0 && (
-                            <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
-                              <Dialog>
-                                <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
-                                  {doc.photo.map((doc, index) => {
-                                    return (
-                                      <Image
-                                        alt="photo"
-                                        width={0}
-                                        height={0}
-                                        key={doc.id}
-                                        src={doc.file_url_with_protocol}
-                                        onClick={() =>
-                                          setTimelineImageIndex(index)
-                                        }
-                                        className="h-[100px]  min-w-[100px] object-cover rounded-sm !cursor-pointer"
-                                      />
-                                    );
-                                  })}
-                                </DialogTrigger>
-                                <DialogContent className="min-w-full h-full bg-[#1717173d] border-transparent">
-                                  <DialogHeader className="mb-4 text-white">
-                                    <DialogTitle>Task Images</DialogTitle>
-                                  </DialogHeader>
-                                  <TaskCarousel
-                                    images={doc.photo}
-                                    currentIndex={timelineImageIndex}
-                                  />
-                                  <DialogClose className="text-white absolute top-6 right-6">
-                                    <MdClose className="text-2xl" />
-                                  </DialogClose>
-                                </DialogContent>
-                              </Dialog>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-            <div className="pt-2">
-              {taskDetail?.timeline?.map((doc) => {
-                return (
-                  <div className=" border-[1px] border-neutral-200 rounded-md p-4 mx-2 mb-3">
-                    <div className="flex items-center justify-start">
-                      <Image
-                        src="/images/timeline.png"
-                        alt="category"
-                        width={24}
-                        height={15}
-                        className="mr-4 w-7 h-7 text-slate-600 "
-                      />
-                      <div key={doc.task_update_id} className="">
-                        <p className="text-sm">{doc.title}</p>
-                        <p className="text-[10px] text-neutral-500 w-max overflow-x-hidden">
-                          {doc.remark.substring(0, 100)}
-                        </p>
-                        <div className="text-sm text-neutral-300 flex items-center justify-between">
-                          <p>{formatDate(doc.date)}</p>
-                          <p>{doc.updated_by}</p>
-                        </div>
-                      </div>
+                        );
+                      })}
                     </div>
-
-                    {doc.photo.length > 0 && (
-                      <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
-                        <Dialog>
-                          <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
-                            {doc.photo.map((doc, index) => {
-                              return (
-                                <Image
-                                  alt="photo"
-                                  width={0}
-                                  height={0}
-                                  key={doc.id}
-                                  src={doc.file_url_with_protocol}
-                                  onClick={() => setTimelineImageIndex(index)}
-                                  className="h-[100px]  min-w-[100px] object-cover rounded-sm !cursor-pointer"
-                                />
-                              );
-                            })}
-                          </DialogTrigger>
-                          <DialogContent className="min-w-full h-full bg-[#1717173d] border-transparent">
-                            <DialogHeader className="mb-4 text-white">
-                              <DialogTitle>Task Images</DialogTitle>
-                            </DialogHeader>
-                            <TaskCarousel
-                              images={doc.photo}
-                              currentIndex={timelineImageIndex}
-                            />
-                            <DialogClose className="text-white absolute top-6 right-6">
-                              <MdClose className="text-2xl" />
-                            </DialogClose>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-[30%] absolute bottom-4 right-8">
-        <Dialog open={progressOpen} onOpenChange={setProgressOpen}>
-          <DialogTrigger className="w-full">
-            <Button className="w-full bg-green-600 hover:bg-green-500">
-              Update Task Progress
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="mb-6">Update Task Progress</DialogTitle>
-
-              <div>
-                <div className="flex items-center justify-between w-max border-2 rounded-sm border-green-600">
-                  <p
-                    onClick={() => setNoProgress(false)}
-                    className={`px-4 py-2 cursor-pointer ${
-                      !noProgress ? "bg-green-600 text-white" : "text-black"
-                    } `}
-                  >
-                    Update Progress
-                  </p>
-                  <p
-                    onClick={() => setNoProgress(true)}
-                    className={`px-4 py-2 cursor-pointer ${
-                      noProgress ? "bg-green-600 text-white" : "text-black"
-                    } `}
-                  >
-                    No Progress Today
-                  </p>
-                </div>
-
-                <div className="flex items-start justify-start my-4">
-                  <p className="mt-3 text-sm w-[25%]">Estimated</p>
-                  <p className="mt-3 text-sm">
-                    {taskDetail?.task_progress}/{taskDetail?.estimated_work}{" "}
-                    {taskDetail?.unit}
-                  </p>
-                </div>
-
-                {!noProgress && (
-                  <div className="flex items-start justify-start my-4">
-                    <p className="mt-3 text-sm w-[25%]">Work Progress</p>
-
-                    {taskDetail?.unit === "Percentage" ? (
-                      <Slider
-                        color="#37AD4A"
-                        className="mt-4 w-[60%]"
-                        onValueChange={handleSliderChange}
-                        value={[progress]}
-                        min={0}
-                        max={100}
-                        step={1}
-                      />
-                    ) : (
-                      <div className="w-[75%] flex flex-col items-start justify-between">
-                        <div className="flex items-center justify-start mt-3 border-b-2 border-neutral-400 w-[60%] pb-1">
-                          <input
-                            placeholder="Ex. 100"
-                            type="number"
-                            max={taskDetail?.estimated_work}
-                            min={0}
-                            onChange={(e) => {
-                              if (e.target.value) {
-                                setProgress(Number(e.target.value));
-                              }
-                            }}
-                            className="text-sm  w-[60%] border-none outline-none"
-                          />
-                          <p className="text-sm ml-4 self-end">
-                            {taskDetail?.unit}
+                  </SheetContent>
+                </Sheet>
+              </div>
+              <div className="pt-2">
+                {taskDetail?.timeline?.map((doc) => {
+                  return (
+                    <div className=" border-[1px] border-neutral-200 rounded-md p-4 mx-2 mb-3">
+                      <div className="flex items-center justify-start">
+                        <Image
+                          src="/images/timeline.png"
+                          alt="category"
+                          width={24}
+                          height={15}
+                          className="mr-4 w-7 h-7 text-slate-600 "
+                        />
+                        <div key={doc.task_update_id} className="">
+                          <p className="text-sm">{doc.title}</p>
+                          <p className="text-[10px] text-neutral-500 w-max overflow-x-hidden">
+                            {doc.remark.substring(0, 100)}
                           </p>
+                          <div className="text-sm text-neutral-300 flex items-center justify-between">
+                            <p>{formatDate(doc.date)}</p>
+                            <p>{doc.updated_by}</p>
+                          </div>
                         </div>
                       </div>
-                    )}
 
-                    {taskDetail?.unit === "Percentage" && (
-                      <p className="mt-3 text-sm">{progress}/100%</p>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-start justify-between my-8">
-                  <p className="mt-1 text-sm w-[25%]">Remarks</p>
-
-                  <Textarea
-                    placeholder="Add Remarks here"
-                    rows={3}
-                    value={remark}
-                    onChange={(e) => setRemark(e.target.value)}
-                    className="w-[75%] mb-6"
-                  />
-                </div>
-
-                <DialogClose className="w-full">
-                  <Button
-                    onClick={() => {
-                      if (task?.unit == "Percentage") {
-                        var taskData = {
-                          task_id: taskDetail?.id,
-                          progress: progress - task.progress_percentage,
-                          remarks: remark,
-                        };
-                        console.log(taskData);
-                        dispatch(updateTaskProgress(taskData));
-                        setOpen(false);
-                      } else {
-                        var taskData = {
-                          task_id: taskDetail?.id,
-                          progress: progress,
-                          remarks: remark,
-                        };
-                        console.log(taskData);
-                        dispatch(updateTaskProgress(taskData));
-                        setOpen(false);
-                      }
-                    }}
-                    className="w-full bg-green-600 my-6"
-                  >
-                    Update
-                  </Button>
-                </DialogClose>
+                      {doc.photo.length > 0 && (
+                        <div className="flex items-center justify-start gap-x-4 w-[90%] overflow-y-hidden overflow-x-auto h-[130px] mt-3 rounded-sm">
+                          <Dialog>
+                            <DialogTrigger className="flex items-center justify-start gap-4 w-full overflow-x-auto py-3">
+                              {doc.photo.map((doc, index) => {
+                                return (
+                                  <Image
+                                    alt="photo"
+                                    width={0}
+                                    height={0}
+                                    key={doc.id}
+                                    src={doc.file_url_with_protocol}
+                                    onClick={() => setTimelineImageIndex(index)}
+                                    className="h-[100px]  min-w-[100px] object-cover rounded-sm !cursor-pointer"
+                                  />
+                                );
+                              })}
+                            </DialogTrigger>
+                            <DialogContent className="min-w-full h-full bg-[#1717173d] border-transparent">
+                              <DialogHeader className="mb-4 text-white">
+                                <DialogTitle>Task Images</DialogTitle>
+                              </DialogHeader>
+                              <TaskCarousel
+                                images={doc.photo}
+                                currentIndex={timelineImageIndex}
+                              />
+                              <DialogClose className="text-white absolute top-6 right-6">
+                                <MdClose className="text-2xl" />
+                              </DialogClose>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -380,7 +380,7 @@ export function TaskTable({ onTaskClick, categories }: DataTableDemoProps) {
               {tasks.length}
             </p>
           </TabsTrigger>
-          <TabsTrigger onClick={() => setTab("New")} value="New">
+          <TabsTrigger onClick={() => setTab("Yet To Start")} value="New">
             Yet to start
             <p className="px-2 py-1  ml-2 bg-[#BAF8F1] rounded-sm ">
               {tasks.filter((task) => task.status === "Yet To Start").length}

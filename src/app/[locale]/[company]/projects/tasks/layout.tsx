@@ -28,7 +28,7 @@ export default function TaskLayout({ children }: Props) {
   return (
     <main className="relative w-full h-[90vh] flex items-center justify-between box-border">
       <div className="!w-[15%] h-full  p-4 rounded-sm">
-        <div className="w-full flex items-center justify-center">
+        {/* <div className="w-full flex items-center justify-center">
           <div
             onClick={() => {
               router.push(`/${gcompanyId}/projects`);
@@ -38,11 +38,11 @@ export default function TaskLayout({ children }: Props) {
             <MdArrowBackIos />
             <p className="text-sm font-semibold ml-1">Go to Projects</p>
           </div>
-        </div>
+        </div> */}
 
         <div className="w-[100%] flex flex-col items-center justify-center">
           <img
-            src="https://cdn.cpdonline.co.uk/wp-content/uploads/2023/03/04151341/Everything-you-need-to-know-about-Construction-Site-Safety.jpg"
+            src="/images/thumbnail.png"
             className="h-[150px] w-[150px] object-cover rounded-md"
           />
           <p className="text-lg font-semibold text-slate-900 dark:text-white  mt-2 mb-6">
@@ -50,9 +50,9 @@ export default function TaskLayout({ children }: Props) {
           </p>
         </div>
 
-        <Link
-          onClick={() => setNavItem("dashboard")}
-          href={`/${gcompanyId}/projects/tasks/project-dashboard`}
+        <p
+        // onClick={() => setNavItem("dashboard")}
+        // href={`/${gcompanyId}/projects/tasks/project-dashboard`}
         >
           <div
             className={`text-md px-4 py-2 mb-1 flex items-center  rounded-sm dark:bg-slate-800 text-sm cursor-pointer ${
@@ -63,7 +63,7 @@ export default function TaskLayout({ children }: Props) {
           >
             <p className="ml-2">Dashboard</p>
           </div>
-        </Link>
+        </p>
 
         <Link
           onClick={() => setNavItem("tasks")}
@@ -78,9 +78,9 @@ export default function TaskLayout({ children }: Props) {
           </div>
         </Link>
 
-        <Link
-          onClick={() => setNavItem("attendance")}
-          href={`/${gcompanyId}/projects/tasks/attendance`}
+        <p
+        // onClick={() => setNavItem("attendance")}
+        // href={`/${gcompanyId}/projects/tasks/attendance`}
         >
           <div
             className={`text-md px-4 py-2 mb-1 flex items-center  rounded-sm dark:bg-slate-800 text-sm cursor-pointer ${
@@ -91,11 +91,11 @@ export default function TaskLayout({ children }: Props) {
           >
             <p className="ml-2">Attendance</p>
           </div>
-        </Link>
+        </p>
 
-        <Link
-          onClick={() => setNavItem("files")}
-          href={`/${gcompanyId}/projects/tasks/files`}
+        <p
+        // onClick={() => setNavItem("files")}
+        // href={`/${gcompanyId}/projects/tasks/files`}
         >
           <div
             className={`text-md px-4 py-2 mb-1 flex items-center  rounded-sm dark:bg-slate-800 text-sm cursor-pointer ${
@@ -104,7 +104,7 @@ export default function TaskLayout({ children }: Props) {
           >
             <p className="ml-2">Files</p>
           </div>
-        </Link>
+        </p>
       </div>
 
       <div className="w-[85%] h-full pl-5 relative">{children}</div>

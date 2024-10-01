@@ -277,7 +277,7 @@ export function ProjectList({
           </TabsTrigger>
         </TabsList>
 
-        <Dialog>
+        {/* <Dialog>
           <DialogTrigger className="w-max">
             <Button>Add Project</Button>
           </DialogTrigger>
@@ -312,7 +312,7 @@ export function ProjectList({
               <Button className="bg-green-600 mt-2 w-full">Update</Button>
             </DialogClose>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
 
       <div className="flex items-center pb-4 h-[10%]">

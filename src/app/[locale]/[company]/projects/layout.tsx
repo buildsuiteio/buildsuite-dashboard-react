@@ -94,9 +94,9 @@ export default function DashboardLayout({ children }: Props) {
               )}
             </div>
           </Link>
-          <Link
-            onClick={() => setNavItem("book")}
-            href={`/${gcompanyId}/projects/book`}
+          <p
+          // onClick={() => setNavItem("book")}
+          // href={`/${gcompanyId}/projects/book`}
           >
             <div className="flex flex-col items-center justify-center mb-4">
               <div
@@ -121,11 +121,11 @@ export default function DashboardLayout({ children }: Props) {
                 </p>
               )}
             </div>
-          </Link>
+          </p>
 
-          <Link
-            onClick={() => setNavItem("teams")}
-            href={`/${gcompanyId}/projects/teams`}
+          <p
+          // onClick={() => setNavItem("teams")}
+          // href={`/${gcompanyId}/projects/teams`}
           >
             <div className="flex flex-col items-center justify-center mb-4">
               <div
@@ -150,7 +150,7 @@ export default function DashboardLayout({ children }: Props) {
                 </p>
               )}
             </div>
-          </Link>
+          </p>
           {/* <div onClick={() => {
                     setCollapsed(!collapsed);
                 }} className="absolute top-8 z-10 right-[-24px] p-2 bg-white dark:bg-slate-900 text-slate-700 dark:text-white shadow-lg hover:shadow-md rounded-full cursor-pointer">

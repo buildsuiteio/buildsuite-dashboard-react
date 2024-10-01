@@ -12,8 +12,8 @@ export default function Navigation() {
     <nav className="w-full flex justify-between text-white mb-4">
       <p className=" text-black dark:text-white font-semibold">{t("home")}</p>
       <div className="flex">
-        <ThemeChanger />
-        <LocaleSwitcher />
+        {/* <ThemeChanger />
+        <LocaleSwitcher /> */}
         <Link
           href={"/"}
           onClick={() => {
