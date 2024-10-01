@@ -1,4 +1,3 @@
-
 import clsx from "clsx";
 import { Provider } from "react-redux";
 import { store } from "@/state/store";
@@ -16,10 +15,9 @@ import { ThemeProvider } from "@/components/custom/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 type Props = {
-    children: ReactNode;
-    params: { locale: string };
+  children: ReactNode;
+  params: { locale: string };
 };
-
 
 export default async function LocaleLayout({
   children,
@@ -37,7 +35,7 @@ export default async function LocaleLayout({
       <body className={clsx(inter.className, "flex h-full flex-col")}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
           key="theme-provider"
