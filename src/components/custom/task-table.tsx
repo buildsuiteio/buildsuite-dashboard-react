@@ -74,6 +74,7 @@ export interface TaskDetails {
   category: string;
   status: "In Progress" | "Completed" | "In Delay" | "Yet To Start";
   task_progress: number;
+  total_task_progress: number;
   project_id: string;
   unit: string;
   estimated_work: number;

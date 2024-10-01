@@ -1353,7 +1353,11 @@ export default function TaskDetails() {
                             type="number"
                             max={taskDetail?.estimated_work}
                             min={0}
-                            onChange={(e) => {}}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                setProgress(Number(e.target.value));
+                              }
+                            }}
                             className="text-sm  w-[60%] border-none outline-none"
                           />
                           <p className="text-sm ml-4 self-end">
@@ -1384,14 +1388,25 @@ export default function TaskDetails() {
                 <DialogClose className="w-full">
                   <Button
                     onClick={() => {
-                      var taskData = {
-                        task_id: taskDetail?.id,
-                        progress: progress,
-                        remarks: remark,
-                      };
-
-                      dispatch(updateTaskProgress(taskData));
-                      setOpen(false);
+                      if (task?.unit == "Percentage") {
+                        var taskData = {
+                          task_id: taskDetail?.id,
+                          progress: progress - task.progress_percentage,
+                          remarks: remark,
+                        };
+                        console.log(taskData);
+                        dispatch(updateTaskProgress(taskData));
+                        setOpen(false);
+                      } else {
+                        var taskData = {
+                          task_id: taskDetail?.id,
+                          progress: progress,
+                          remarks: remark,
+                        };
+                        console.log(taskData);
+                        dispatch(updateTaskProgress(taskData));
+                        setOpen(false);
+                      }
                     }}
                     className="w-full bg-green-600 my-6"
                   >

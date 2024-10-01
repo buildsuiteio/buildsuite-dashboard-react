@@ -129,24 +129,25 @@ const taskSlice = createSlice({
       })
       .addCase(
         updateTaskProgress.fulfilled,
-        (state, action: PayloadAction<any>) => {
-          let taskDetails = state.currentTaskDetails;
-
-          if (state.currentTask != null && action.payload != null) {
-            console.log("TEST");
-            console.log(action.payload);
-            console.log(action.payload["total_task_progress"]);
-            console.log( (action.payload['total_task_progress'] / state.currentTask.estimated_work ) * 100);
-            state.currentTask = {
-              ...state.currentTask,
-              progress: action.payload["total_task_progress"],
-              progress_percentage: (action.payload['total_task_progress'] / state.currentTask.estimated_work ) * 100,
-            };
+        (state, action: PayloadAction<TaskDetails>) => {
+          if (action.payload != null) {
+            state.currentTaskDetails = action.payload;
           }
 
-          if (taskDetails) {
-            taskDetails.task_progress = action.payload["total_task_progress"];
-            state.currentTaskDetails = taskDetails;
+          if (state.currentTask != null && action.payload != null) {
+            state.currentTask = {
+              ...state.currentTask,
+              category: action.payload.category,
+              status: action.payload.status,
+              progress_percentage: (action.payload.total_task_progress / action.payload.estimated_work) * 100,
+              estimated_work: action.payload.estimated_work,
+              progress: action.payload.total_task_progress,
+            };
+            state.tasks = state.tasks.filter(
+              (task) => task.task_id != action.payload.id
+            );
+            state.tasks = [state.currentTask, ...state.tasks];
+            console.log("SLICE TEST");
           }
         }
       );
@@ -577,6 +578,11 @@ export const updateTaskProgress = createAsyncThunk(
 
       console.log("Task Progress Updated", response.data.details);
       showSuccessToast("Task is updated");
+
+      if (response.status !== 200) {
+        return null
+      }
+
       return response.data.details; // Return the response data
     } catch (error: any) {
       console.error("Get Tasks failed:", error);
@@ -584,7 +590,7 @@ export const updateTaskProgress = createAsyncThunk(
       if (error.response.status == 401) {
         logout();
       }
-      return [];
+      return null;
     }
   }
 );
